@@ -2,11 +2,11 @@ package me.luxoru.sociallink;
 
 import lombok.Getter;
 import me.luxoru.databaserepository.impl.redis.*;
-import me.luxoru.sociallink.commands.AddFriendCommand;
+import me.luxoru.sociallink.commands.friend.add.AddFriendCommand;
 import me.luxoru.sociallink.commands.SendMsgCommand;
 import me.luxoru.sociallink.data.file.ConfigFile;
 import me.luxoru.sociallink.data.redis.RedisDatabaseAdapter;
-import me.luxoru.sociallink.data.redis.commands.RedisCommandManager;
+import me.luxoru.sociallink.data.redis.RedisRepository;
 import me.luxoru.sociallink.listener.PlayerJoinLeaveListener;
 import me.luxoru.sociallink.user.SocialPlayer;
 import me.luxoru.sociallink.user.SocialPlayerManager;
@@ -23,6 +23,7 @@ public class SocialLink extends JavaPlugin {
     private ConfigFile configFile;
     private String serverName;
     private RedisDatabase database;
+    private RedisRepository redisRepository;
 
     @Override
     public void onEnable() {
@@ -50,6 +51,7 @@ public class SocialLink extends JavaPlugin {
                 .connect(new RedisConfigurations(1));
 
         new RedisDatabaseAdapter(database);
+        redisRepository = new RedisRepository(database);
 
 
     }
