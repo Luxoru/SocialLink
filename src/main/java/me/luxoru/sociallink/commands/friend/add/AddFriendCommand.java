@@ -1,7 +1,6 @@
-package me.luxoru.sociallink.commands;
+package me.luxoru.sociallink.commands.friend.add;
 
 import me.luxoru.sociallink.SocialLink;
-import me.luxoru.sociallink.player.ServerPlayer;
 import me.luxoru.sociallink.user.SocialPlayer;
 import me.luxoru.sociallink.user.SocialPlayerManager;
 import org.bukkit.command.Command;
