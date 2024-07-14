@@ -1,4 +1,4 @@
-package me.luxoru.sociallink.data.redis.commands.impl;
+package me.luxoru.sociallink.commands.friend.add;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +13,4 @@ public class FriendRequestCommand extends RedisCommand {
     private final UUID requesterId;
     private final String receiverName;
     private final UUID receiverId;
-
-
 }
