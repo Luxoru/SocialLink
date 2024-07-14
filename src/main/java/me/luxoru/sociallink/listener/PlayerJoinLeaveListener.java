@@ -32,8 +32,11 @@ public class PlayerJoinLeaveListener implements Listener {
         Player player = event.getPlayer();
 
         SocialPlayer socialPlayer = SocialPlayer.createSocialPlayer(player, plugin);
-
+        plugin.getRedisRepository().insert("socialplayer", socialPlayer);
         plugin.getSocialPlayerManager().removePlayer(socialPlayer);
+
+        SocialPlayer socialplayer = plugin.getRedisRepository().getObject("socialplayer", SocialPlayer.class, socialPlayer.getRedisId());
+
     }
 
 }
