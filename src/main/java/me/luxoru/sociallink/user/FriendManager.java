@@ -2,7 +2,7 @@ package me.luxoru.sociallink.user;
 
 import lombok.Getter;
 import me.luxoru.sociallink.data.redis.RedisDatabaseAdapter;
-import me.luxoru.sociallink.data.redis.commands.impl.FriendRequestCommand;
+import me.luxoru.sociallink.commands.friend.add.FriendRequestCommand;
 import me.luxoru.sociallink.player.ServerPlayer;
 import me.luxoru.sociallink.player.ServerPlayerManager;
 import org.bukkit.Bukkit;
