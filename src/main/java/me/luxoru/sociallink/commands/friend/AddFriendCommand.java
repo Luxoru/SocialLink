@@ -1,6 +1,8 @@
 package me.luxoru.sociallink.commands.friend.add;
 
 import me.luxoru.sociallink.SocialLink;
+import me.luxoru.sociallink.commands.SocialLinkCommand;
+import me.luxoru.sociallink.commands.SocialLinkCommandInfo;
 import me.luxoru.sociallink.user.SocialPlayer;
 import me.luxoru.sociallink.user.SocialPlayerManager;
 import org.bukkit.command.Command;
@@ -8,7 +10,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class AddFriendCommand implements CommandExecutor {
+@SocialLinkCommandInfo(name = "add", isSubComand = true)
+public class AddFriendCommand extends SocialLinkCommand {
 
     private final SocialLink plugin;
 
@@ -17,23 +20,26 @@ public class AddFriendCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-
-        if(!(commandSender instanceof Player player)){
+    public boolean execute(CommandSender sender, Command command, String label, String[] args) {
+        if(!(sender instanceof Player player)){
             return false;
         }
         SocialPlayerManager socialPlayerManager = plugin.getSocialPlayerManager();
 
         SocialPlayer socialPlayer = socialPlayerManager.getSocialPlayer(player.getUniqueId());
 
-        if(strings.length != 1){
+        if(args.length != 1){
             return false;
         }
 
-        String friend = strings[0];
+        String friend = args[0];
 
-        socialPlayer.getFriendManager().sendFriendRequest(friend);
-
+        boolean b = socialPlayer.getFriendManager().sendFriendRequest(friend);
+        if(b){
+            player.sendMessage("Sent friend request to " + friend);
+        }else{
+            player.sendMessage(friend+" has never joined the network :(");
+        }
 
 
         return true;
