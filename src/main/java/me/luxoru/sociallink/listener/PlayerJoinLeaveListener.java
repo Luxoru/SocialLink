@@ -2,7 +2,10 @@ package me.luxoru.sociallink.listener;
 
 
 import me.luxoru.sociallink.SocialLink;
+import me.luxoru.sociallink.message.Message;
+import me.luxoru.sociallink.message.friend.FriendRequestPendingMessage;
 import me.luxoru.sociallink.user.SocialPlayer;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,9 +24,27 @@ public class PlayerJoinLeaveListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        SocialPlayer socialPlayer = SocialPlayer.createSocialPlayer(player, plugin);
-
+        SocialPlayer socialPlayer = SocialPlayer.getOrCreateSocialPlayer(player, plugin);
         plugin.getSocialPlayerManager().addPlayer(socialPlayer);
+        int count = 0;
+        for(Message message : socialPlayer.getMessages()){
+            if(message instanceof FriendRequestPendingMessage friendRequestPendingMessage){
+                if(friendRequestPendingMessage.hasExpired()){
+                    socialPlayer.removeMessage(message);
+                    continue;
+                }
+                count++;
+            }
+        }
+
+        if(count != 0){
+            player.sendMessage(ChatColor.BLUE+"╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸");
+            player.sendMessage(ChatColor.GREEN+"You have "+count+" pending friend requests");
+            player.sendMessage(ChatColor.YELLOW+"Use "+ChatColor.AQUA+"/f requests "+ChatColor.YELLOW+"to see them!");
+            player.sendMessage(ChatColor.BLUE+"╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸");
+
+
+        }
 
     }
 
@@ -31,11 +52,11 @@ public class PlayerJoinLeaveListener implements Listener {
     public void onPlayerLeave(PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
-        SocialPlayer socialPlayer = SocialPlayer.createSocialPlayer(player, plugin);
+        SocialPlayer socialPlayer = plugin.getSocialPlayerManager().getSocialPlayer(player.getUniqueId());
         plugin.getRedisRepository().insert("socialplayer", socialPlayer);
-        plugin.getSocialPlayerManager().removePlayer(socialPlayer);
 
-        SocialPlayer socialplayer = plugin.getRedisRepository().getObject("socialplayer", SocialPlayer.class, socialPlayer.getRedisId());
+        plugin.getSocialPlayerManager().removePlayer(player.getUniqueId());
+
 
     }
 
