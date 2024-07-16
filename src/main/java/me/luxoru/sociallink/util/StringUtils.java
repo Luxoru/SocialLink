@@ -30,4 +30,11 @@ public class StringUtils {
 
     }
 
+    public static String removeLastChar(String str) {
+        if (str != null && !str.isEmpty()) {
+            return str.substring(0, str.length() - 1);
+        }
+        return str;
+    }
+
 }
