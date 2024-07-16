@@ -4,15 +4,12 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import me.luxoru.databaserepository.impl.redis.RedisDatabase;
 import me.luxoru.databaserepository.impl.redis.RedisMessangerService;
-import org.redisson.api.RMap;
-import org.redisson.api.RMapCache;
-import org.redisson.api.RSet;
+import me.luxoru.sociallink.util.StringUtils;
+import org.redisson.api.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class RedisRepository extends RedisMessangerService {
 
@@ -55,5 +52,16 @@ public class RedisRepository extends RedisMessangerService {
         instance.construct(data);
 
         return instance;
+    }
+
+    public final <T extends RedisObject> Set<T> getObjects(@NonNull String keyPrefix, @NonNull Class<T> type){
+        RKeys keys = database.getClient().getKeys();
+        Set<T> set = new HashSet<>();
+        Iterable<String> keysByPattern = keys.getKeysByPattern(keyPrefix+".*");
+        for(String key : keysByPattern){
+            String uuid = key.split("\\.")[1];
+            set.add(getObject(keyPrefix, type, uuid));
+        }
+        return set;
     }
 }
