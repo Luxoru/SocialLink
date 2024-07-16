@@ -2,8 +2,7 @@ package me.luxoru.sociallink;
 
 import lombok.Getter;
 import me.luxoru.databaserepository.impl.redis.*;
-import me.luxoru.sociallink.commands.friend.add.AddFriendCommand;
-import me.luxoru.sociallink.commands.SendMsgCommand;
+import me.luxoru.sociallink.commands.CommandManager;
 import me.luxoru.sociallink.data.file.ConfigFile;
 import me.luxoru.sociallink.data.redis.RedisDatabaseAdapter;
 import me.luxoru.sociallink.data.redis.RedisRepository;
@@ -25,12 +24,15 @@ public class SocialLink extends JavaPlugin {
     private RedisDatabase database;
     private RedisRepository redisRepository;
 
+    public static SocialLink INSTANCE;
+
     @Override
     public void onEnable() {
+        INSTANCE = this;
         this.socialPlayerManager = new SocialPlayerManager();
         addAllPlayers();
         initialiseListeners();
-        initialiseCommands();
+
 
         configFile = new ConfigFile(this, "server-info.yml");
         FileConfiguration fileConfiguration = configFile.getConfigFile();
@@ -52,14 +54,12 @@ public class SocialLink extends JavaPlugin {
 
         new RedisDatabaseAdapter(database);
         redisRepository = new RedisRepository(database);
+        new CommandManager(this);
 
 
     }
 
-    private void initialiseCommands() {
-        getCommand("sendMsg").setExecutor(new SendMsgCommand(this));
-        getCommand("addFriend").setExecutor(new AddFriendCommand(this));
-    }
+
 
     private void initialiseListeners() {
         getServer().getPluginManager().registerEvents(new PlayerJoinLeaveListener(this), this);
@@ -67,7 +67,7 @@ public class SocialLink extends JavaPlugin {
 
     private void addAllPlayers() {
         for (Player player : getServer().getOnlinePlayers()) {
-            SocialPlayer socialPlayer = SocialPlayer.createSocialPlayer(player, this);
+            SocialPlayer socialPlayer = SocialPlayer.getOrCreateSocialPlayer(player, this);
             socialPlayerManager.addPlayer(socialPlayer);
         }
     }
