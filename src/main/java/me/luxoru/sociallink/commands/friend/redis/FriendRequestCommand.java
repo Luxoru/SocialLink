@@ -1,4 +1,4 @@
-package me.luxoru.sociallink.commands.friend.add;
+package me.luxoru.sociallink.commands.friend.redis;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
