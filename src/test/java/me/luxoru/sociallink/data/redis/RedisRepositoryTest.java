@@ -6,9 +6,14 @@ import me.luxoru.databaserepository.impl.redis.RedisDatabase;
 import me.luxoru.databaserepository.impl.redis.RedisNode;
 import me.luxoru.databaserepository.impl.redis.RedisNodeType;
 import me.luxoru.sociallink.data.redis.object.TestRedisObj;
+import me.luxoru.sociallink.message.Message;
+import me.luxoru.sociallink.message.friend.FriendRequestPendingMessage;
+import me.luxoru.sociallink.user.SocialPlayer;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,46 +29,21 @@ public class RedisRepositoryTest {
                 .addMasterNode(new RedisNode("MASTER", "127.0.0.1", RedisConfigurations.DEFAULT_PORT, RedisNodeType.MASTER))
                 .connect(new RedisConfigurations(1));
         redisRepository = new RedisRepository(database);
+        RedisDatabaseAdapter redisDatabaseAdapter = new RedisDatabaseAdapter(database);
 
     }
 
     @SneakyThrows
     @Test
     public void testInsert(){
+
         init();
 
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
-
-        for(int i = 0; i < 4; i++){
-            executorService.execute(() -> {
-                TestRedisObj testRedisObj = new TestRedisObj();
-                redisRepository.insert("player", testRedisObj);
-
-                TestRedisObj obj = redisRepository.getObject("player", TestRedisObj.class, testRedisObj.getRedisId());
-
-                System.out.println(obj.getRedisId());
-                System.out.println(obj.getTTL().getTime());
-                try {
-                    TimeUnit.SECONDS.sleep(obj.getTTL().getTime());
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-
-                TestRedisObj deletedObj = redisRepository.getObject("player", TestRedisObj.class, testRedisObj.getRedisId());
-
-                if(deletedObj == null){
-                    return;
-                }
-
-                if (deletedObj.getRedisId().equals(obj.getRedisId())) {
-                    Assert.fail();
-                }
-
-            });
-        }
+        SocialPlayer socialPlayer = redisRepository.getObject("socialplayer", SocialPlayer.class, "263370ee-3237-47e2-b992-59d942f7394c");
 
 
-        boolean b = executorService.awaitTermination(5, TimeUnit.DAYS);
+
+
 
     }
     
