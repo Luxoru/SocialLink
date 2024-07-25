@@ -44,4 +44,7 @@ public abstract class RedisObject {
         return TimeToLiveRule.FOREVER;
     }
 
+    public abstract RedisObject save();
+
+
 }
