@@ -25,7 +25,6 @@ public class MessageAdapterFactory implements TypeAdapterFactory {
             public void write(JsonWriter out, T value) throws IOException {
                 JsonObject obj = new JsonObject();
                 if (value instanceof FriendRequestPendingMessage) {
-                    System.out.println("Instance of FR");
                     obj.addProperty("type", "FriendRequestPendingMessage");
                     obj.add("data", friendRequestPendingMessageTypeAdapter.toJsonTree((FriendRequestPendingMessage) value));
                 }
