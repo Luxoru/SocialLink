@@ -13,4 +13,6 @@ public class FriendRequestCommand extends RedisCommand {
     private final UUID requesterId;
     private final String receiverName;
     private final UUID receiverId;
+
+
 }
