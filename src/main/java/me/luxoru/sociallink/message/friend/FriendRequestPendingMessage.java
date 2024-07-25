@@ -11,17 +11,31 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 
 @Data
 @AllArgsConstructor
 public class FriendRequestPendingMessage implements Message {
 
+    private UUID friendRequestID;
     private UUID senderUUID;
     private UUID receiverUUID;
-    private long expire;
+    private TimeToLiveRule expire;
 
-    public boolean hasExpired(){
-        return System.currentTimeMillis() > expire;
+
+    @Override
+    public UUID getMessageUUID() {
+        return friendRequestID;
+    }
+
+
+    public boolean isSender(UUID playerUUID){
+        return senderUUID.equals(playerUUID);
+    }
+
+    @Override
+    public boolean hasExpired() {
+        return expire.getTimeUnit().toMillis(expire.getTime()) > System.currentTimeMillis();
     }
 }
