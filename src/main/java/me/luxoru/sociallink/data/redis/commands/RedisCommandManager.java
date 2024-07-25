@@ -26,8 +26,6 @@ public class RedisCommandManager {
 
                 RedisCommand redisCommand = GSON.fromJson(message, commandClazz);
 
-                System.out.println(redisCommand.toString());
-
                 for (RedisCommandCallback callback : callbacks.getOrDefault(commandClazz, Collections.emptySet())) {
                     callback.handle(redisCommand);
                 }
