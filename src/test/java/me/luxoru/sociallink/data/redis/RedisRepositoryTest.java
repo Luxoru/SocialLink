@@ -5,19 +5,11 @@ import me.luxoru.databaserepository.impl.redis.RedisConfigurations;
 import me.luxoru.databaserepository.impl.redis.RedisDatabase;
 import me.luxoru.databaserepository.impl.redis.RedisNode;
 import me.luxoru.databaserepository.impl.redis.RedisNodeType;
-import me.luxoru.sociallink.data.redis.object.TestRedisObj;
-import me.luxoru.sociallink.message.Message;
-import me.luxoru.sociallink.message.friend.FriendRequestPendingMessage;
-import me.luxoru.sociallink.user.SocialPlayer;
-import org.junit.Assert;
+import me.luxoru.sociallink.friend.FriendRequest;
 import org.junit.Test;
 
-import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 
 public class RedisRepositoryTest {
@@ -37,11 +29,16 @@ public class RedisRepositoryTest {
     @Test
     public void testInsert(){
 
-        init();
+     /* init();
+        //FriendRequest friendRequest = new FriendRequest(UUID.randomUUID(), UUID.randomUUID());
+        redisRepository.insert("friendrequest", friendRequest);
+        Logger.getLogger("name").warning("INSERTED OBJECT: ");
+        redisRepository.addDeletedObjectListener("friendrequest", friendRequest.getRedisId(), (string) ->{
+            Logger.getLogger("name").severe("EXPIRED OBJECT: " + string);
+        });
 
-        SocialPlayer socialPlayer = redisRepository.getObject("socialplayer", SocialPlayer.class, "263370ee-3237-47e2-b992-59d942f7394c");
-
-
+        Thread.sleep(100000);
+*/
 
 
 
