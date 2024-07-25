@@ -26,6 +26,8 @@ public class RedisCommandManager {
 
                 RedisCommand redisCommand = GSON.fromJson(message, commandClazz);
 
+                System.out.println(redisCommand.toString());
+
                 for (RedisCommandCallback callback : callbacks.getOrDefault(commandClazz, Collections.emptySet())) {
                     callback.handle(redisCommand);
                 }
@@ -45,19 +47,19 @@ public class RedisCommandManager {
     }
 
 
-    public void addCommand(@NonNull Class<? extends RedisCommand> command) {
+    public synchronized void addCommand(@NonNull Class<? extends RedisCommand> command) {
         commands.put(command.getSimpleName(), command);
     }
 
 
-    public <T extends RedisCommand> void addCallback(@NonNull Class<T> clazz, @NonNull RedisCommandCallback<T> callback) {
+    public synchronized <T extends RedisCommand> void addCallback(@NonNull Class<T> clazz, @NonNull RedisCommandCallback<T> callback) {
         Set<RedisCommandCallback<?>> callbacks = Collections.synchronizedSet(this.callbacks.getOrDefault(clazz, new HashSet<>()));
         callbacks.add(callback);
         this.callbacks.put(clazz, callbacks);
     }
 
 
-    public void dispatch(RedisCommand command) {
+    public synchronized void dispatch(RedisCommand command) {
         String commandName = command.getClass().getSimpleName();
         if (commands.get(commandName) == null) { // If the command is not registered, don't dispatch it
             System.err.println("Could not find Redis command \"" + commandName + "\", not dispatching");
