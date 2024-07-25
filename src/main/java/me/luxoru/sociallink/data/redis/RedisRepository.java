@@ -33,7 +33,6 @@ public class RedisRepository extends RedisMessangerService {
         for(Map.Entry<String, Object> entry : object.toMap().entrySet()){
             TimeToLiveRule ttl = object.getTTL();
             if(ttl.getTime() > 0){//Has TTL
-                System.out.println("TTL: "+ttl.getTime()+" "+ ttl.getTimeUnit());
                 mapCache.put(entry.getKey(), String.valueOf(entry.getValue()), ttl.getTimeUnit().toSeconds(ttl.getTime()), TimeUnit.SECONDS);
                 continue;
             }
