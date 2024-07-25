@@ -17,14 +17,14 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
-
+/**
+ * Represents a social player with associated server player, friend manager, and message manager.
+ */
 @Getter
 public class SocialPlayer extends RedisObject {
 
-
-    private  ServerPlayer serverPlayer;
+    private ServerPlayer serverPlayer;
     private FriendManager friendManager;
-
     private MessageManager messageManager;
 
     @Getter
@@ -34,18 +34,21 @@ public class SocialPlayer extends RedisObject {
             .registerTypeAdapterFactory(new MessageAdapterFactory())
             .create();
 
-    public SocialPlayer(){
-
+    public SocialPlayer() {
+        // Default constructor
     }
 
-    public SocialPlayer(ServerPlayer serverPlayer){
+    /**
+     * Constructs a SocialPlayer with the given ServerPlayer.
+     *
+     * @param serverPlayer the server player associated with this social player
+     */
+    public SocialPlayer(ServerPlayer serverPlayer) {
         this();
         this.serverPlayer = serverPlayer;
         this.friendManager = new FriendManager(this, getServerPlayer().getUuid());
         this.messageManager = new MessageManager();
     }
-
-
 
     @Override
     public @NonNull String getRedisId() {
@@ -54,14 +57,11 @@ public class SocialPlayer extends RedisObject {
 
     @Override
     public void construct(@NonNull Map<String, String> data) {
-        serverPlayer = gson.fromJson(data.get("serverplayer"), new TypeToken<ServerPlayer>(){}.getType());
-        friendManager = gson.fromJson(data.get("friendmanager"), new TypeToken<FriendManager>(){}.getType());
+        serverPlayer = gson.fromJson(data.get("serverplayer"), new TypeToken<ServerPlayer>() {}.getType());
+        friendManager = gson.fromJson(data.get("friendmanager"), new TypeToken<FriendManager>() {}.getType());
         messageManager = new MessageManager();
-        messageManager.setMessages(gson.fromJson(data.get("messages"), new TypeToken<Set<Message>>(){}.getType()));
-
+        messageManager.setMessages(gson.fromJson(data.get("messages"), new TypeToken<Set<Message>>() {}.getType()));
     }
-
-
 
     @Override
     public @NonNull Map<String, Object> toMap() {
@@ -90,24 +90,35 @@ public class SocialPlayer extends RedisObject {
         return this;
     }
 
-
-    public static SocialPlayer getOrCreateSocialPlayer(Player player, SocialLink plugin){
-        SocialPlayer socialplayer = RedisRepository.INSTANCE.getObject("sociallink.socialplayer", SocialPlayer.class, player.getUniqueId().toString());
-        if(socialplayer == null){
+    /**
+     * Retrieves an existing SocialPlayer from the Redis repository or creates a new one if it doesn't exist.
+     *
+     * @param player the Bukkit player
+     * @param plugin the SocialLink plugin instance
+     * @return the SocialPlayer instance
+     */
+    public static SocialPlayer getOrCreateSocialPlayer(Player player, SocialLink plugin) {
+        SocialPlayer socialPlayer = RedisRepository.INSTANCE.getObject("sociallink.socialplayer", SocialPlayer.class, player.getUniqueId().toString());
+        if (socialPlayer == null) {
             System.out.println("Creating social player " + player.getUniqueId());
             return createSocialPlayer(player, plugin);
         }
         System.out.println("Retrieved social player " + player.getUniqueId());
-        ServerPlayer.getManager().addPlayer(socialplayer.getServerPlayer());
-        return socialplayer;
-    }
-
-    private static SocialPlayer createSocialPlayer(Player player, SocialLink plugin){
-        ServerPlayer serverPlayer = new ServerPlayer(player.getUniqueId(), player.getName(), plugin.getServerName(), true);
-        SocialPlayer socialPlayer = new SocialPlayer(serverPlayer);
-        socialPlayer.save();
-
+        ServerPlayer.getManager().addPlayer(socialPlayer.getServerPlayer());
         return socialPlayer;
     }
 
+    /**
+     * Creates a new SocialPlayer for the given Bukkit player and saves it to the Redis repository.
+     *
+     * @param player the Bukkit player
+     * @param plugin the SocialLink plugin instance
+     * @return the newly created SocialPlayer instance
+     */
+    private static SocialPlayer createSocialPlayer(Player player, SocialLink plugin) {
+        ServerPlayer serverPlayer = new ServerPlayer(player.getUniqueId(), player.getName(), plugin.getServerName(), true);
+        SocialPlayer socialPlayer = new SocialPlayer(serverPlayer);
+        socialPlayer.save();
+        return socialPlayer;
+    }
 }

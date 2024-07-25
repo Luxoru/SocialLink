@@ -8,6 +8,10 @@ import me.luxoru.sociallink.message.friend.FriendRequestPendingMessage;
 
 import java.io.IOException;
 
+/**
+ * A factory class for creating custom {@link TypeAdapter} instances for serializing and deserializing {@link Message} objects.
+ * This factory handles different types of {@link Message} by including a type identifier in the serialized JSON.
+ */
 public class MessageAdapterFactory implements TypeAdapterFactory {
 
     @Override
@@ -34,7 +38,10 @@ public class MessageAdapterFactory implements TypeAdapterFactory {
             @Override
             public T read(JsonReader in) throws IOException {
                 JsonObject obj = elementAdapter.read(in).getAsJsonObject();
-                if(obj.get("type") == null)return null;
+                if (obj.get("type") == null) {
+                    return null;
+                }
+
                 String type = obj.get("type").getAsString();
                 JsonElement data = obj.get("data");
 
@@ -48,4 +55,3 @@ public class MessageAdapterFactory implements TypeAdapterFactory {
         }.nullSafe();
     }
 }
-
