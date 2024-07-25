@@ -3,6 +3,7 @@ package me.luxoru.sociallink.commands;
 import lombok.Getter;
 import me.luxoru.sociallink.SocialLink;
 import me.luxoru.sociallink.commands.friend.FriendCommand;
+import me.luxoru.sociallink.commands.friend.MessageFriendCommand;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 
@@ -22,7 +23,8 @@ public class CommandManager {
         registerCommands();
     }
 
-    public void registerCommand(String commandName, CommandExecutor commandExecutor) {
+    public void registerCommand(SocialLinkCommand commandExecutor) {
+        String commandName = commandExecutor.getName();
         PluginCommand command = plugin.getCommand(commandName);
         if (command != null) {
             command.setExecutor(commandExecutor);
@@ -43,7 +45,8 @@ public class CommandManager {
     }
 
     private void registerCommands(){
-        registerCommand("friend", new FriendCommand(plugin));
+        registerCommand(new FriendCommand());
+        registerCommand(new MessageFriendCommand());
     }
 
 
