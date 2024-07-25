@@ -4,14 +4,19 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import me.luxoru.databaserepository.impl.redis.RedisDatabase;
 import me.luxoru.databaserepository.impl.redis.RedisMessangerService;
-import me.luxoru.sociallink.util.StringUtils;
 import org.redisson.api.*;
+import org.redisson.api.map.event.EntryEvent;
+import org.redisson.api.map.event.EntryExpiredListener;
+import org.redisson.api.map.event.MapEntryListener;
 
-import java.lang.reflect.InvocationTargetException;
-import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 public class RedisRepository extends RedisMessangerService {
+
+    public static final RedisRepository INSTANCE = new RedisRepository(RedisDatabaseAdapter.INSTANCE.getDatabase());
 
     private final RedisDatabase database;
     public RedisRepository(RedisDatabase database) {
@@ -28,7 +33,8 @@ public class RedisRepository extends RedisMessangerService {
         for(Map.Entry<String, Object> entry : object.toMap().entrySet()){
             TimeToLiveRule ttl = object.getTTL();
             if(ttl.getTime() > 0){//Has TTL
-                mapCache.put(entry.getKey(), String.valueOf(entry.getValue()), ttl.getTimeUnit().toSeconds(ttl.getTime()), ttl.getTimeUnit());
+                System.out.println("TTL: "+ttl.getTime()+" "+ ttl.getTimeUnit());
+                mapCache.put(entry.getKey(), String.valueOf(entry.getValue()), ttl.getTimeUnit().toSeconds(ttl.getTime()), TimeUnit.SECONDS);
                 continue;
             }
             mapCache.put(entry.getKey(), String.valueOf(entry.getValue()));
@@ -64,4 +70,30 @@ public class RedisRepository extends RedisMessangerService {
         }
         return set;
     }
+
+
+    public final void addDeletedObjectListener(String keyPrefix, String objectID, Consumer<EntryEvent<String, String>> consumer){
+        RMapCache<String, String> mapCache = database.getClient().getMapCache(keyPrefix+"."+objectID);
+        final AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+        mapCache.addListener((EntryExpiredListener<String, String>) entryEvent -> {
+            if (atomicBoolean.compareAndSet(false, true)) {
+                    consumer.accept(entryEvent);
+            }
+        });
+
+    }
+
+    public final void addListener(String keyPrefix, String objectID, MapEntryListener listener){
+        RMapCache<String, String> mapCache = database.getClient().getMapCache(keyPrefix+"."+objectID);
+        mapCache.addListener(listener);
+
+    }
+
+
+    public final void destroy(String keyPrefix, String objectId){
+        System.out.println("PLACE: "+keyPrefix+"."+objectId);
+        RMapCache<String, String> mapCache = database.getClient().getMapCache(keyPrefix+"."+objectId);
+        mapCache.delete();
+    }
+
 }
