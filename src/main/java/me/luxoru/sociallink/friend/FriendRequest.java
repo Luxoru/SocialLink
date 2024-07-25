@@ -2,15 +2,11 @@ package me.luxoru.sociallink.friend;
 
 import lombok.Getter;
 import lombok.NonNull;
-import me.luxoru.sociallink.SocialLink;
 import me.luxoru.sociallink.commands.friend.redis.FriendRequestExpiredCommand;
-import me.luxoru.sociallink.data.redis.RedisDatabaseAdapter;
 import me.luxoru.sociallink.data.redis.RedisObject;
 import me.luxoru.sociallink.data.redis.RedisRepository;
 import me.luxoru.sociallink.data.redis.TimeToLiveRule;
 import me.luxoru.sociallink.util.MiscUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
