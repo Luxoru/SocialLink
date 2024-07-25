@@ -4,4 +4,3 @@ main: me.luxoru.sociallink.SocialLink
 api-version: 1.20
 commands:
   friend:
-    aliases: ["f", "fr"]
