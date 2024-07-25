@@ -6,9 +6,11 @@ import me.luxoru.sociallink.commands.CommandManager;
 import me.luxoru.sociallink.data.file.ConfigFile;
 import me.luxoru.sociallink.data.redis.RedisDatabaseAdapter;
 import me.luxoru.sociallink.data.redis.RedisRepository;
+import me.luxoru.sociallink.data.redis.TimeToLiveRule;
 import me.luxoru.sociallink.listener.PlayerJoinLeaveListener;
 import me.luxoru.sociallink.user.SocialPlayer;
 import me.luxoru.sociallink.user.SocialPlayerManager;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -16,23 +18,20 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.UUID;
 
 @Getter
+
 public class SocialLink extends JavaPlugin {
 
-    private SocialPlayerManager socialPlayerManager;
+
     private ConfigFile configFile;
     private String serverName;
     private RedisDatabase database;
-    private RedisRepository redisRepository;
-
-    public static SocialLink INSTANCE;
 
     @Override
     public void onEnable() {
-        INSTANCE = this;
-        this.socialPlayerManager = new SocialPlayerManager();
+
+
         addAllPlayers();
         initialiseListeners();
-
 
         configFile = new ConfigFile(this, "server-info.yml");
         FileConfiguration fileConfiguration = configFile.getConfigFile();
@@ -46,15 +45,27 @@ public class SocialLink extends JavaPlugin {
         }
 
         configFile.save();
-        getLogger().info("Social Link enabled!\nServer-name: " + serverName);
 
-        database = new RedisDatabase()
-                .addMasterNode(new RedisNode("master", "127.0.0.1", RedisConfigurations.DEFAULT_PORT, RedisNodeType.MASTER))
-                .connect(new RedisConfigurations(1));
+
+        try{
+            database = new RedisDatabase()
+                    .addMasterNode(new RedisNode("master", "127.0.0.1", RedisConfigurations.DEFAULT_PORT, RedisNodeType.MASTER))
+                    .connect(new RedisConfigurations(1));
+        }
+        catch (Exception e){
+            getLogger().severe("Stopping, not connected to Redis...");
+            Bukkit.shutdown();
+            System.exit(1);
+            return;
+        }
 
         new RedisDatabaseAdapter(database);
-        redisRepository = new RedisRepository(database);
+
+
+
         new CommandManager(this);
+
+        getLogger().info("Social Link enabled!\nServer-name: " + serverName);
 
 
     }
@@ -68,7 +79,7 @@ public class SocialLink extends JavaPlugin {
     private void addAllPlayers() {
         for (Player player : getServer().getOnlinePlayers()) {
             SocialPlayer socialPlayer = SocialPlayer.getOrCreateSocialPlayer(player, this);
-            socialPlayerManager.addPlayer(socialPlayer);
+            SocialPlayer.getManager().addPlayer(socialPlayer, TimeToLiveRule.FOREVER);
         }
     }
 
