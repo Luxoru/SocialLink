@@ -9,8 +9,8 @@ import java.util.UUID;
 @Setter
 public class ServerPlayer {
 
-    private final UUID uuid;
-    private final String name;
+    private UUID uuid;
+    private String name;
     private String serverName;
     private boolean online;
     private long lastOnline;
