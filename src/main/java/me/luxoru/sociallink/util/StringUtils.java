@@ -1,8 +1,11 @@
 package me.luxoru.sociallink.util;
 
+import lombok.experimental.UtilityClass;
+
 import java.util.concurrent.ThreadLocalRandom;
 
-public class StringUtils {
+@UtilityClass
+public final class StringUtils {
 
 
     public static String generateRandomString(int length) {
