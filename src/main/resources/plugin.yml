@@ -3,5 +3,5 @@ version: 1.0
 main: me.luxoru.sociallink.SocialLink
 api-version: 1.20
 commands:
-  sendMsg:
-  addFriend:
+  friend:
+    aliases: ["f", "fr"]
