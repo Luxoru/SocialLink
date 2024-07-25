@@ -4,6 +4,7 @@ import lombok.NonNull;
 import me.luxoru.sociallink.data.redis.RedisObject;
 import me.luxoru.sociallink.data.redis.TimeToLiveRule;
 import me.luxoru.sociallink.util.StringUtils;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,5 +34,10 @@ public class TestRedisObj extends RedisObject {
     @Override
     public @NonNull TimeToLiveRule getTTL() {
         return new TimeToLiveRule(10, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public TestRedisObj save() {
+        return this;
     }
 }
